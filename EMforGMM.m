@@ -77,7 +77,7 @@ gama = zeros(size(X,1), length(w));
 
 %% ALGORITMO EM P/ CALCULAR OS PARAMETROS DA GMMM
 
-iter = 40;  % numero de iterações do ALGORITMO
+iter = 100;  % numero de iterações do ALGORITMO
 
 for ii = 1:iter
 
@@ -92,16 +92,24 @@ for ii = 1:iter
     w = sum(gama,1)./size(gama,1);      % novos pesos da GMM
     
     % calculo das novas médias da GMM
-    mu = gama'*X;                                  % calculo do numerador da formula da média
-    mu = mu./repmat((sum(gama,1))',1,size(mu,2));  % calculo final da media
+    mu_ = gama'*X;                                  % calculo do numerador da formula da média
+    mu_ = mu_./repmat((sum(gama,1))',1,size(mu_,2));  % calculo final da media
     
     % calculo das novas matriz de covariancia da GMM
     for jj = 1:length(w)
-         vari = repmat(gama(:,jj),1,size(X,2)).*(X - repmat(mu(jj,:),size(X,1),1));
+         vari = repmat(gama(:,jj),1,size(X,2)).*(X - repmat(mu_(jj,:),size(X,1),1));
          cov(:,:,jj) = (vari'*vari)/sum(gama(:,jj),1);
     end
     
-    % dist = norm(mu1_real - Mu(1,:)) + norm(mu2_real - Mu(2,:));
+    dist = norm(mu_(1,:) - mu(1,:)) + norm(mu_(2,:) - mu(2,:));
+    
+    if dist <= limiar
+        disp(ii)
+        break;
+    end
+   
+    mu = mu_;
+    
 end
 
 
